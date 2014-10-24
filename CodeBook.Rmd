@@ -64,5 +64,9 @@ I already did that in step 1 by using colnames(...) <- ...
 ```{r grouping,echo=TRUE}
 Grouped <- aggregate(Mean_sd[,3:81], by=list(Mean_sd$Activities,Mean_sd$Subject), FUN=mean)
 colnames(Grouped)[1:2] <- c("Activity","ID")
-Grouped
+```
+
+  Finally, I save a local file with the tidy data...
+```{r tidy, echo=TRUE}
+write.table(Grouped,"TidyData.txt",row.name=FALSE,sep=",")
 ```

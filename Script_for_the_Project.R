@@ -36,4 +36,4 @@ Mean_sd$Activities <-activity[Mean_sd$Activities,2]
 
 Grouped <- aggregate(Mean_sd[,3:81], by=list(Mean_sd$Activities,Mean_sd$Subject), FUN=mean)
 colnames(Grouped)[1:2] <- c("Activity","ID")
-Grouped
+write.table(Grouped,"TidyData.txt",row.name=FALSE,sep=",")
