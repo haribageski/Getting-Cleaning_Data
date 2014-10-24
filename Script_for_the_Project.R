@@ -1,14 +1,5 @@
----
-title: "CodeBook"
-author: "Haralampi Bageski"
-date: "Friday, October 24, 2014"
-output: html_document
----
-
-#Loading and preprocessing the data...
-  First I need to move to my "Class Project" directory where I have manually unzipped "getdata-projectfiles-UCI HAR Dataset". Then I create tables for the different files...
-```{r read_tables,echo=TRUE}
 setwd("C:/Users/hari/Documents/R/Getting and Cleaning Data/Class Project")
+
 library(utils)
 unzip("getdata-projectfiles-UCI HAR Dataset.zip")
 X_train<-read.table("getdata-projectfiles-UCI HAR Dataset/UCI HAR Dataset/train/X_train.txt",header=FALSE)
@@ -22,12 +13,7 @@ subject_test<-read.table("getdata-projectfiles-UCI HAR Dataset/UCI HAR Dataset/t
 
 activity <- read.table("getdata-projectfiles-UCI HAR Dataset/UCI HAR Dataset/activity_labels.txt",header=FALSE)
 features <- read.table("getdata-projectfiles-UCI HAR Dataset/UCI HAR Dataset/features.txt",header=FALSE)
-```
-  The dimension for X train is 7352x561 , and subject train is 7352x1, y train is 7352x1, features is 561x2, so we can notice that the dimensions nicely fit together.
-  
-#   1. Merges the training and the test sets to create one data set.
-  Here I first combine the test with the training sets by rows, and then I append X,y, and subject by column. I get a data frame of dimension 10299x563.
-```{r melting,echo=TRUE}
+
 install.packages("reshape")
 library(reshape)
 X <- rbind(X_train,X_test)
@@ -38,31 +24,16 @@ colnames(Y) <- c("Activities")
 subject <- rbind(subject_train,subject_test)
 colnames(subject) <- c("Subject")
 Merged <- cbind(subject,Y,X)
-```
-    
-#    2. Extracts only the measurements on the mean and standard deviation for each measurement. 
-  Here I apply filtering with grepl to get the wanted rows in features, which are the columns we want to select. But since the names of the columns in Merged are 1,2,... , we want to select the columns not by name but by index.
-```{r mean_sd,echo=TRUE}
+
 head(features)
 features[7,]
 mean_sd <- which(grepl("mean",features[,2]) | grepl("std",features[,2]))
 Mean_sd <- cbind(Merged[,1:2],Merged[,2+mean_sd]) #The first two columns are not in "features"
-```
 
-#  3. Uses descriptive activity names to name the activities in the data set
-```{r activity_labels,echo=TRUE}
+
 #We need to substitute the column of Activities from numbers to Words...
 Mean_sd$Activities <-activity[Mean_sd$Activities,2]
-```
 
-
-#  4. Appropriately labels the data set with descriptive variable names. 
-I already did that in step 1 by using colnames(...) <- ...
-
-#  5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-  Here I create the final tidy data frame - "Grouped", which will be of dimension 180x81.
-```{r grouping,echo=TRUE}
 Grouped <- aggregate(Mean_sd[,3:81], by=list(Mean_sd$Activities,Mean_sd$Subject), FUN=mean)
 colnames(Grouped)[1:2] <- c("Activity","ID")
 Grouped
-```
